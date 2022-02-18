@@ -1,0 +1,30 @@
+{
+
+    "manifest_version": 3,
+    "name": "macarte-ign-utilities",
+    "version": "1.0",
+
+    "description": "Set of utilities to improve usability of macarte.ign.fr",
+
+    "icons": {},
+
+    "content_scripts": [
+      {
+        "matches": ["https://macarte.ign.fr/*"],
+        "js": [
+          "main.js"
+        ]
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "matches": ["https://macarte.ign.fr/*"],
+        "resources": [
+          "MiuGui.js",
+          "MiuActions.js",
+          "MiuUtils.js",
+          "MiuInit.js"
+        ]
+      }
+    ]
+  }
