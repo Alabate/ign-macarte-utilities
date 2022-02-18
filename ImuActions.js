@@ -1,4 +1,4 @@
-class MiuActions {
+class ImuActions {
     /** List of features stored after a copy action */
     static clipboard = []
 
@@ -6,7 +6,7 @@ class MiuActions {
      * Clone selected features and store them until paste
      */
     static copy() {
-        const selectedFeatures = MiuUtils.getSelectedFeatures()
+        const selectedFeatures = ImuUtils.getSelectedFeatures()
         this.clipboard = []
         for (const feature of selectedFeatures) {
             const newFeature = feature.clone()
@@ -23,16 +23,16 @@ class MiuActions {
         this.copy()
 
         // Delete selected features from all layers
-        const selectedFeatures = MiuUtils.getSelectedFeatures()
+        const selectedFeatures = ImuUtils.getSelectedFeatures()
         for (const feature of selectedFeatures) {
-            const layers = MiuUtils.findLayersFromFeature(feature)
+            const layers = ImuUtils.findLayersFromFeature(feature)
             for (const layer of layers) {
                 layer.getSource().removeFeature(feature);
                 feature.changed()
             }
         }
         // Clear selection to definitely delete them
-        MiuUtils.unselect()
+        ImuUtils.unselect()
     }
 
     /**
@@ -46,14 +46,14 @@ class MiuActions {
         // Compute the transform applied to all features
         // Center the first point of the first feature in the middle of the view
         // And translate all the copied feature like the first to conserve relative positions
-        const center = MiuUtils.getViewCenter()
+        const center = ImuUtils.getViewCenter()
         const firstPoint = this.clipboard[0].getGeometry().getFirstCoordinate()
         const tx = center[0] - firstPoint[0]
         const ty = center[1] - firstPoint[1]
 
         // Copy
         const newFeatures = [];
-        const currentLayerSource = MiuUtils.getCurrentLayerSource()
+        const currentLayerSource = ImuUtils.getCurrentLayerSource()
         for (const feature of this.clipboard) {
             const newFeature = feature.clone()
             const ignStyle = Object.assign({}, feature.getIgnStyle())
@@ -65,7 +65,7 @@ class MiuActions {
 
         // Select in transform mode the first feature to make the
         // "paste and move" action easier
-        MiuUtils.select(newFeatures, true)
+        ImuUtils.select(newFeatures, true)
     }
 
     /**
@@ -83,7 +83,7 @@ class MiuActions {
         }
 
         // Paste style on all selected features while keeping the label
-        const selectedFeatures = MiuUtils.getSelectedFeatures()
+        const selectedFeatures = ImuUtils.getSelectedFeatures()
         for (const feature of selectedFeatures) {
             const newStyle = Object.assign({}, copiedStyle)
             if (feature.getIgnStyle().labelAttribute) {

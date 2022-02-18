@@ -1,7 +1,6 @@
 {
-
     "manifest_version": 3,
-    "name": "macarte-ign-utilities",
+    "name": "ign-macarte-utilities",
     "version": "1.0",
 
     "description": "Set of utilities to improve usability of macarte.ign.fr",
@@ -20,10 +19,10 @@
       {
         "matches": ["https://macarte.ign.fr/*"],
         "resources": [
-          "MiuGui.js",
-          "MiuActions.js",
-          "MiuUtils.js",
-          "MiuInit.js"
+          "ImuGui.js",
+          "ImuActions.js",
+          "ImuUtils.js",
+          "ImuInit.js"
         ]
       }
     ]

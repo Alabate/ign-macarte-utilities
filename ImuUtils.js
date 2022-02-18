@@ -1,4 +1,4 @@
-class MiuUtils {
+class ImuUtils {
 
     /**
      * Get the macarte object
@@ -77,7 +77,7 @@ class MiuUtils {
     static select(features, useTransform = false) {
         if (useTransform) {
             // Ensure we are in the selection mode
-            MiuGui.enableMode('Transform')
+            ImuGui.enableMode('Transform')
             const interaction = this.carte.getInteractionByName("TransformInteraction")
 
             // We select the first one because this mode doens't support more
@@ -85,7 +85,7 @@ class MiuUtils {
         }
         else {
             // Ensure we are in the selection mode
-            MiuGui.enableMode('None')
+            ImuGui.enableMode('None')
 
             this.unselect()
             const interaction = this.carte.getInteractionByName("SelectInteraction")

@@ -1,30 +1,30 @@
 /**
  * Utility functions to tweak the MaCarte user interface
  */
-class MiuGui {
+class ImuGui {
     static BUTTONS = [
         {
             title: 'Couper (ctrl+x)',
             icon: 'fa-scissors',
-            action: e => MiuActions.cut(e),
+            action: e => ImuActions.cut(e),
             documentEvent: 'cut',
         },
         {
             title: 'Copier (ctrl+c)',
             icon: 'fa-copy',
-            action: e => MiuActions.copy(e),
+            action: e => ImuActions.copy(e),
             documentEvent: 'copy',
         },
         {
             title: 'Coller (ctrl+v)',
             icon: 'fa-paste',
-            action: e => MiuActions.paste(e),
+            action: e => ImuActions.paste(e),
             documentEvent: 'paste',
         },
         {
             title: 'Coller le style',
             icon: 'fa-tint',
-            action: e => MiuActions.pasteStyle(e),
+            action: e => ImuActions.pasteStyle(e),
         }
     ]
 
