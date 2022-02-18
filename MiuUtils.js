@@ -50,6 +50,53 @@ class MiuUtils {
     }
 
     /**
+     * Unselect every selected items (compatible with transform select)
+     */
+    static unselect() {
+        // Unselect for the hand selection tool
+        let interaction = this.carte.getInteractionByName("SelectInteraction")
+        if (interaction) {
+            return interaction.getFeatures().clear()
+        }
+
+        // Unselect for the transform mode
+        interaction = this.carte.getInteractionByName("TransformInteraction")
+        if (interaction) {
+            interaction.select();
+            interaction.drawSketch_();
+        }
+
+        // Else act like nothing is selected
+        return []
+    }
+
+    /**
+     * Selected the given features
+     * Compatible with transform select, but select only the first feature
+     */
+    static select(features, useTransform = false) {
+        if (useTransform) {
+            // Ensure we are in the selection mode
+            MiuGui.enableMode('Transform')
+            const interaction = this.carte.getInteractionByName("TransformInteraction")
+
+            // We select the first one because this mode doens't support more
+            interaction.select(features[0])
+        }
+        else {
+            // Ensure we are in the selection mode
+            MiuGui.enableMode('None')
+
+            this.unselect()
+            const interaction = this.carte.getInteractionByName("SelectInteraction")
+            for (const feature of features) {
+                // Didn't find a clean way to do it :(
+                interaction.featureOverlay_.getSource().getFeaturesCollection().push(feature)
+            }
+        }
+    }
+
+    /**
      * Get the source of the layer that is currently selected for drawing
      * You can then modify this source to add or remove elemnts from this layer
      * @see https://openlayers.org/en/latest/apidoc/module-ol_source_Vector-VectorSource.html
@@ -74,5 +121,34 @@ class MiuUtils {
      */
     static timedMsgBox(text, duration = null, button = null) {
         return this.macarte.wdialog.msgInfo(text, duration, button)
+    }
+
+    /**
+     * Get the coordinates of the center of the view
+     * @see https://openlayers.org/en/latest/apidoc/module-ol_View-View.html#getCenter
+     * @returns {Array} x as first element, y as second
+     */
+    static getViewCenter() {
+        return this.map.getView().getCenter()
+    }
+
+    /**
+     * Find layers where the given feature is
+     * A feature shouldn't be in multiple layer but can it's still possible
+     * @param {ol.Feature} feature The feature to look for
+     * @returns {ol.layer.Vector[]} List of vector layers that contains the feature
+     */
+    static findLayersFromFeature(feature) {
+        const out = [];
+        const layers = this.map.getLayers().getArray()
+        for (const layer of layers) {
+            if (layer.getType() == 'vector') {
+                const layerFeatures = layer.getSource().getFeatures()
+                if (layerFeatures.indexOf(feature) != -1) {
+                    out.push(layer)
+                }
+            }
+        }
+        return out
     }
 }
