@@ -153,19 +153,98 @@ class ImuUtils {
     }
 
     /**
-     * Set zoom level
-     * @param {float} zoom
+     * Check if the angled formed by 3 points is orthogonal
+     * @param {ol.coordinate.Coordinate} a Point coordinates
+     * @param {ol.coordinate.Coordinate} b Point coordinates
+     * @param {ol.coordinate.Coordinate} c Point coordinates
+     * @returns {boolean} True if the angle is orthogonal
      */
-    static setZoom(zoom) {
-        this.map.getView().setZoom(zoom)
+    static isOrthogonal(a, b, c, epsilon = 1e-10)
+    {
+        return Math.abs((b[0] - a[0]) * (b[0] - c[0]) + (b[1] - a[1]) * (b[1] - c[1])) <= epsilon;
     }
 
     /**
-     * Get zoom level
-     * @return {float} zoom
+     * Compute euclidean distance between two points
+     * @param {ol.coordinate.Coordinate} a Point coordinates
+     * @param {ol.coordinate.Coordinate} b Point coordinates
+     * @returns {float} The computed distance
      */
-    static getZoom() {
-        return this.map.getView().getZoom()
+    static getDistance(a, b)
+    {
+        return Math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
     }
 
+    /**
+     * Check if the given geometry is a rectangle
+     * @param {ol.geom.Geometry} geometry The geometry to test
+     * @returns {boolean} True if the geometry is a rectangle
+     */
+    static isRectangle(geometry) {
+        // Simples checks for polygon and number of coordinates
+        if (geometry.getType() != 'Polygon') {
+            return false
+        }
+        const coordinates = geometry.getCoordinates()
+        if (coordinates.length != 1 && coordinates[0].length != 4) {
+            return false
+        }
+
+        // Check if rectangle by checking if 3 angles are orthogonal
+        const a = coordinates[0][0]
+        const b = coordinates[0][1]
+        const c = coordinates[0][2]
+        const d = coordinates[0][3]
+        const EPSILON = 1e-1
+        return (
+            this.isOrthogonal(a, b, c, EPSILON)
+            && this.isOrthogonal(b, c, d, EPSILON)
+            && this.isOrthogonal(c, d, a, EPSILON)
+        )
+    }
+
+    /**
+     * Get angle of the longest side of the rectangle on unit circle
+     *  (=> counter clockwise + start on the right)
+     * If geometry is not a rectangle, this will return unexpected results
+     * @param {ol.geom.Geometry} geometry The geometry work on
+     * @returns {float} The angle of the longest side of the rectangle in radians
+     */
+    static getRectangleAngle(geometry) {
+        const coordinates = geometry.getCoordinates()
+        const a = coordinates[0][0]
+        const b = coordinates[0][1]
+        const c = coordinates[0][2]
+
+        // Find the longest side
+        if (this.getDistance(a,b) > this.getDistance(b,c)) {
+            return Math.atan2((b[1] - a[1]),(b[0] - a[0]))
+        }
+        else {
+            return Math.atan2((c[1] - b[1]),(c[0] - b[0]))
+        }
+    }
+
+    /**
+     * Return the angle of the segment on the unit circle
+     *  (=> counter clockwise + start on the right)
+     * This function only work for 2 points line string
+     * @param {ol.geom.Geometry} geometry The geometry work on
+     * @returns {float} The angle of the segment or false if geometry is not a 2
+     *  points line string
+     */
+    static getSegmentAngle(geometry) {
+        // Simples checks for polygon and number of coordinates
+        if (geometry.getType() != 'LineString') {
+            return false
+        }
+        const coordinates = geometry.getCoordinates()
+        if (coordinates.length != 2) {
+            return false
+        }
+
+        const a = coordinates[0]
+        const b = coordinates[1]
+        return Math.atan2((b[1] - a[1]),(b[0] - a[0]))
+    }
 }

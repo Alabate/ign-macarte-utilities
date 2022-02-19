@@ -88,15 +88,36 @@ class ImuGui {
      * @returns {function} the new style function to set on vector layers
      */
     static #getTweakedStyleFunction(styleFn) {
-        return (f, res, clustered) => {
-            let styles = styleFn(f, res, clustered)
+        return (feature, resolution, clustered) => {
+            const geometry = feature.getGeometry()
+            // Compute text rotation angle if possible
+            let textAngle = 0
+            if (ImuUtils.isRectangle(geometry)) {
+                textAngle = ImuUtils.getRectangleAngle(geometry)
+                // We have a trigonometric angle between pi and -pi
+                // We want a positive clockwise angle with 0 on the left
+                textAngle = (2*Math.PI - textAngle) % (2*Math.PI)
+            }
+            else {
+                const segmentAngle = ImuUtils.getSegmentAngle(geometry)
+                if (segmentAngle) {
+                    textAngle = segmentAngle
+                    // We have a trigonometric angle between pi and -pi
+                    // We want a positive clockwise angle with 0 on the left
+                    textAngle = (2*Math.PI - textAngle) % (2*Math.PI)
+                }
+            }
+
+            let styles = styleFn(feature, resolution, clustered)
             for (const style of styles) {
-                // Scale text with zoom
                 if (style.getText()) {
+                    // Scale text with zoom
                     // This is an arbitrary ratio that fit well my exisiting project
                     const ratio = 0.1
-                    let resolution = ImuUtils.map.getView().getResolution()
-                    style.getText().setScale(ratio / resolution + 0)
+                    style.getText().setScale(ratio / resolution)
+
+                    // Rotate text properly for rectangles and lines
+                    style.getText().setRotation(textAngle)
                 }
             }
             return styles
