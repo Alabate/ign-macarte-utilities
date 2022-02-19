@@ -82,4 +82,52 @@ class ImuGui {
         }
     }
 
+    /**
+     * Generate a style function that should be set on every vector layers
+     * @param {function} styleFn The existing styleFn that will still be executed
+     * @returns {function} the new style function to set on vector layers
+     */
+    static #getTweakedStyleFunction(styleFn) {
+        return (f, res, clustered) => {
+            let styles = styleFn(f, res, clustered)
+            for (const style of styles) {
+                // Scale text with zoom
+                if (style.getText()) {
+                    // This is an arbitrary ratio that fit well my exisiting project
+                    const ratio = 0.1
+                    let resolution = ImuUtils.map.getView().getResolution()
+                    style.getText().setScale(ratio / resolution + 0)
+                }
+            }
+            return styles
+        }
+    }
+
+    /**
+     * Configure vector layers to use our custom style function
+     */
+    static #configureTweakedStyleFunction() {
+        const layers = ImuUtils.map.getLayers().getArray()
+        for (const layer of layers) {
+            // Ensure we configure the function once with _imuEventConfigured
+            if (layer.getType() == 'vector' && !layer.layerVector_._imuEventConfigured) {
+                let styleFunction = layer.layerVector_.getStyle()
+                let newStyleFunction = this.#getTweakedStyleFunction(styleFunction)
+                layer.layerVector_.setStyle(newStyleFunction)
+                layer.layerVector_._imuEventConfigured = true
+            }
+        }
+    }
+
+    /**
+     * Add event listening on layer count to allow overriding the style function
+     * on each layer
+     */
+    static initStyleTweaking() {
+        window.macarte.carte.map.getLayers()
+        .addEventListener('change:length', () => {
+            this.#configureTweakedStyleFunction()
+        })
+        this.#configureTweakedStyleFunction()
+    }
 }

@@ -6,6 +6,7 @@ function ImuInit() {
     // Build the UI once page loaded
     window.addEventListener('load', () => {
         ImuGui.addDrawToolBoxButtons()
+        ImuGui.initStyleTweaking()
     })
 }
 ImuInit()

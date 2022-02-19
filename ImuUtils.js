@@ -151,4 +151,21 @@ class ImuUtils {
         }
         return out
     }
+
+    /**
+     * Set zoom level
+     * @param {float} zoom
+     */
+    static setZoom(zoom) {
+        this.map.getView().setZoom(zoom)
+    }
+
+    /**
+     * Get zoom level
+     * @return {float} zoom
+     */
+    static getZoom() {
+        return this.map.getView().getZoom()
+    }
+
 }
