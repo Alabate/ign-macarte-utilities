@@ -1,9 +1,9 @@
 {
     "manifest_version": 3,
-    "name": "ign-macarte-utilities",
+    "name": "IGN MaCarte Utilities",
     "version": "1.0",
 
-    "description": "Set of utilities to improve usability of macarte.ign.fr",
+    "description": "Ajoute des fonctionnalités à macarte.ign.fr",
 
     "icons": {},
 
