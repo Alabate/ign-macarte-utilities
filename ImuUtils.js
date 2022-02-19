@@ -247,4 +247,34 @@ class ImuUtils {
         const b = coordinates[1]
         return Math.atan2((b[1] - a[1]),(b[0] - a[0]))
     }
+
+    /**
+     * Parse the string as float
+     * Coma and dot are accepted as floating point separator
+     * Return NaN if parsing failed
+     * @param {string} input The string to parse
+     * @returns {float} The parsed fload or NaN in case of failure
+     */
+    static parseInputFloat(input) {
+        input = input.replace(',', '.')
+        return parseFloat(input)
+    }
+
+    /**
+     * Compute distance conversion ratio between OpenLayer projection
+     * format (EPSG:3857) and approximate real heart distances
+     * This ratio depends on the size of the shape because
+     * of the elliptic shape of the earth. This is why we use the shape size
+     * to compute the ratio
+     * @param {float} width Shape width or height or length
+     * @returns {float} The computed ratio, multiply it on with and height.
+     */
+    static computeDistanceConversionRatio(width) {
+        const center = this.getViewCenter()
+        const x1 = center[0] - (width/2)
+        const x2 = center[0] + (width/2)
+        const line = new ol.geom.LineString([[x1, center[1]], [x2, center[1]]])
+        const ratio = (width != 0) ? Math.abs(width / ol.sphere.getLength(line)) : 1
+        return ratio
+    }
 }

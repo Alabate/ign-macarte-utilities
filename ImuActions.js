@@ -93,4 +93,158 @@ class ImuActions {
             feature.changed()
         }
     }
+
+    /**
+     * Prompt for dimensions and create a rectangle
+     */
+    static addRectangle() {
+        // Form
+        const htmlTemplate = `
+            <p class="titre">Créer un rectangle</p>
+            <form id="addRectangleForm">
+                <label>
+                    Largeur (m) :
+                    <input id="addRectangleWidth" required></input>
+                </label>
+                <br/>
+
+                <label>
+                    Hauteur (m) :
+                    <input id="addRectangleHeight" required></input>
+                </label>
+                <br/>
+
+                <label>
+                    Rotation horaire (°) :
+                    <input id="addRectangleAngle" value="0" required></input>
+                </label>
+                <br/>
+
+                <button type="submit" class="bouton">Créer le rectangle</button>
+            </form>
+        `
+        ImuUtils.macarte.wdialog.show(
+            htmlTemplate,
+            { 'modal': false, 'width': 400, 'class': 'wizzard'}
+        );
+
+        // Submit
+        document.getElementById('addRectangleForm').onsubmit = e => {
+            e.preventDefault()
+
+            // Input validation
+            const width = ImuUtils.parseInputFloat(
+                document.getElementById('addRectangleWidth').value
+            )
+            const height = ImuUtils.parseInputFloat(
+                document.getElementById('addRectangleHeight').value
+            )
+            const angle = ImuUtils.parseInputFloat(
+                document.getElementById('addRectangleAngle').value
+            )
+            if (isNaN(width) || isNaN(height) || isNaN(angle)) {
+                console.log('[IMU] Failed to parse inputs ', width, height, angle)
+                return
+            }
+
+            // Parsing validated close modal
+            ImuUtils.macarte.wdialog.hide();
+
+            // Convert rectangle dimensions from real world to EPSG:3857
+            const ratio = ImuUtils.computeDistanceConversionRatio(width)
+            const convertedWidth = width * ratio
+            const convertedHeight = height * ratio
+
+            // Compute rectangle coordinates in the screen
+            const center = ImuUtils.getViewCenter()
+            const x1 = center[0] - (convertedWidth / 2)
+            const x2 = center[0] + (convertedWidth / 2)
+            const y1 = center[1] - (convertedHeight / 2)
+            const y2 = center[1] + (convertedHeight / 2)
+
+            // Create the feature and rotate it as requested
+            const feature = new ol.Feature({
+                geometry: new ol.geom.Polygon(
+                    [[[x1, y1], [x2, y1], [x2, y2], [x1, y2]]]
+                )
+            })
+            feature.getGeometry().rotate(- angle / 180 * Math.PI, center)
+
+            // Add rectangle to the currently selected layer
+            // And select it in transform mode
+            ImuUtils.getCurrentLayerSource().addFeature(feature)
+            ImuUtils.select([feature], true)
+        }
+    }
+
+    /**
+     * Prompt for dimensions and create a segment
+     */
+    static addSegment() {
+        // Form
+        const htmlTemplate = `
+            <p class="titre">Créer un segment</p>
+            <form id="addSegmentForm">
+                <label>
+                    Longeur (m) :
+                    <input id="addSegmentLength" required></input>
+                </label>
+                <br/>
+
+                <label>
+                    Rotation horaire depuis l'horizontale (°) :
+                    <input id="addSegmentAngle" value="0" required></input>
+                </label>
+                <br/>
+
+                <button type="submit" class="bouton">Créer le segment</button>
+            </form>
+        `
+        ImuUtils.macarte.wdialog.show(
+            htmlTemplate,
+            { 'modal': false, 'width': 400, 'class': 'wizzard'}
+        );
+
+        // Submit
+        document.getElementById('addSegmentForm').onsubmit = e => {
+            e.preventDefault()
+
+            // Input validation
+            const length = ImuUtils.parseInputFloat(
+                document.getElementById('addSegmentLength').value
+            )
+            const angle = ImuUtils.parseInputFloat(
+                document.getElementById('addSegmentAngle').value
+            )
+            if (isNaN(length) || isNaN(angle)) {
+                console.log('[IMU] Failed to parse inputs ', length, angle)
+                return
+            }
+
+            // Parsing validated close modal
+            ImuUtils.macarte.wdialog.hide();
+
+            // Convert rectangle dimensions from real world to EPSG:3857
+            const ratio = ImuUtils.computeDistanceConversionRatio(length)
+            const convertedLength = length * ratio
+
+            // Compute rectangle coordinates in the screen
+            const center = ImuUtils.getViewCenter()
+            const x1 = center[0] - (convertedLength / 2)
+            const x2 = center[0] + (convertedLength / 2)
+
+            // Create the feature and rotate it as requested
+            const feature = new ol.Feature({
+                geometry: new ol.geom.LineString(
+                    [[x1, center[1]], [x2, center[1]]]
+                )
+            })
+            feature.getGeometry().rotate(- angle / 180 * Math.PI, center)
+
+            // Add rectangle to the currently selected layer
+            // And select it in transform mode
+            ImuUtils.getCurrentLayerSource().addFeature(feature)
+            ImuUtils.select([feature], true)
+        }
+    }
 }

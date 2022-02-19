@@ -25,6 +25,16 @@ class ImuGui {
             title: 'Coller le style',
             icon: 'fa-tint',
             action: e => ImuActions.pasteStyle(e),
+        },
+        {
+            title: 'Ajouter un rectangle',
+            icon: 'fa-square-o',
+            action: e => ImuActions.addRectangle(e),
+        },
+        {
+            title: 'Ajouter un segment',
+            iconText: '/',
+            action: e => ImuActions.addSegment(e),
         }
     ]
 
@@ -56,7 +66,15 @@ class ImuGui {
             // Add button
             const element = document.createElement('i');
             element.title = button.title;
-            element.classList.add('tool', 'fa', button.icon);
+            element.style.minWidth = '22px';
+            element.classList.add('tool', 'fa');
+            if (button.icon) {
+                element.classList.add(button.icon);
+            }
+            else if (button.iconText) {
+                element.style.fontWeight = 'bold';
+                element.innerText = button.iconText
+            }
             element.addEventListener('click', button.action)
             drawToolBoxInner.appendChild(element)
 
