@@ -326,4 +326,66 @@ class ImuActions {
             () => ImuUtils.macarte.wdialog.hide()
         );
     }
+
+    /**
+     * Prompt to which layer you want to move the selection and do it
+     */
+    static moveToLayer() {
+        const selectedFeatures = ImuUtils.getSelectedFeatures()
+        if (selectedFeatures.length == 0) {
+            return
+        }
+
+        // Form
+        const htmlTemplate = `
+            <h3>Changer le calque pour les <span id="moveToLayerSelectionLength"></span> objet(s) sélectionnés</h3>
+            <form id="moveToLayerForm">
+                <label>
+                    Calsque de destination :
+                    <select required id="moveToLayerSelect">
+                    </select>
+                </label>
+                <br/>
+
+                <button type="submit" class="bouton">Déplacer vers ce calque</button>
+            </form>
+        `
+        ImuUtils.macarte.wdialog.show(
+            htmlTemplate,
+            { 'modal': false, 'width': 600, 'class': 'wizzard'}
+        );
+
+        // Configure form
+        const selectionLengthSpan = document.getElementById('moveToLayerSelectionLength')
+        selectionLengthSpan.innerText = selectedFeatures.length
+        const select = document.getElementById('moveToLayerSelect')
+        const layers = ImuUtils.map.getLayers().getArray()
+        for (const [i, layer] of layers.entries()) {
+            if (layer.getType() == 'vector') {
+                const option = document.createElement("option")
+                option.value = i
+                option.text = layer.get('name')
+                select.add(option)
+            }
+        }
+
+        // Submit
+        document.getElementById('moveToLayerForm').onsubmit = e => {
+            e.preventDefault()
+
+            // Input validation
+            const layerId = parseInt(select.value)
+            if (isNaN(layerId) || !layers[layerId]) {
+                console.log('[IMU] Failed to parse inputs ', layerId)
+                return
+            }
+
+            // Delete features from all layers
+            // Then add them back to the new layer
+            ImuUtils.deleteFeaturesFromLayers(selectedFeatures)
+            layers[layerId].getSource().addFeatures(selectedFeatures)
+
+            ImuUtils.macarte.wdialog.hide()
+        }
+    }
 }

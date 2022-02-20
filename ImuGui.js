@@ -46,6 +46,11 @@ class ImuGui {
             title: 'Changer l\'orientation de la carte',
             icon: 'fa-compass',
             action: e => ImuActions.setMapOrientation(e),
+        },
+        {
+            title: 'Changer le calque des objects sélectionnés',
+            icon: 'fa-exchange',
+            action: e => ImuActions.moveToLayer(e),
         }
     ]
 
