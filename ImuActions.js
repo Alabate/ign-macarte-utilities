@@ -106,7 +106,7 @@ class ImuActions {
     static addRectangle() {
         // Form
         const htmlTemplate = `
-            <p class="titre">Créer un rectangle</p>
+            <h3>Créer un rectangle</h3>
             <form id="addRectangleForm">
                 <label>
                     Largeur (m) :
@@ -190,7 +190,7 @@ class ImuActions {
     static addSegment() {
         // Form
         const htmlTemplate = `
-            <p class="titre">Créer un segment</p>
+            <h3>Créer un segment</h3>
             <form id="addSegmentForm">
                 <label>
                     Longeur (m) :
@@ -253,6 +253,59 @@ class ImuActions {
             // And select it in transform mode
             ImuUtils.getCurrentLayerSource().addFeature(feature)
             ImuUtils.select([feature], true)
+        }
+    }
+
+    /**
+     * Prompt for map heading and rotate the map
+     */
+    static setMapOrientation() {
+        // Form
+        const htmlTemplate = `
+            <h3>Changer l'orientation de la carte</h3>
+            <form id="setMapOrientationForm">
+                <label>
+                    Orientation de la carte (°) :
+                    <input id="SetMapOrientationValue" required></input>
+                </label>
+                <br/>
+                <br/>
+                <strong>Exemples de valeurs:</strong><br/>
+                <ul>
+                    <li>• 0°: Le nord en haut</li>
+                    <li>• 45°: Le nord-ouest en haut</li>
+                    <li>• 90°: L'ouest en haut</li>
+                    <li>• -90°: L'est en haut</li>
+                </ul>
+                <button type="submit" class="bouton">Orienter la carte</button>
+            </form>
+        `
+        ImuUtils.macarte.wdialog.show(
+            htmlTemplate,
+            { 'modal': false, 'width': 400, 'class': 'wizzard'}
+        );
+        // Pre-fill the value with the current orientation
+        const oldRotationDeg = ImuUtils.map.getView().getRotation() / Math.PI * 180
+        document.getElementById('SetMapOrientationValue').value = oldRotationDeg
+
+        // Submit
+        document.getElementById('setMapOrientationForm').onsubmit = e => {
+            e.preventDefault()
+
+            // Input validation
+            let rotationDeg = ImuUtils.parseInputFloat(
+                document.getElementById('SetMapOrientationValue').value
+            )
+            if (isNaN(rotationDeg)) {
+                console.log('[IMU] Failed to parse inputs ', rotationDeg)
+                return
+            }
+
+            // Parsing validated close modal
+            ImuUtils.macarte.wdialog.hide();
+
+            // Set map rotation
+            ImuUtils.map.getView().setRotation(rotationDeg / 180 * Math.PI)
         }
     }
 }

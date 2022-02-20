@@ -11,3 +11,4 @@ Set of utilities to improve usability of macarte.ign.fr
 * Create a rectangle with given real width and height in meters
 * Create a segment with given real length in meters
 * Move and transform multiple features at the same time by selecting them with shift+click
+* Rotate the full map

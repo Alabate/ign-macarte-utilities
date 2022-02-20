@@ -35,6 +35,11 @@ class ImuGui {
             title: 'Ajouter un segment',
             iconText: '/',
             action: e => ImuActions.addSegment(e),
+        },
+        {
+            title: 'Changer l\'orientation de la carte',
+            icon: 'fa-compass',
+            action: e => ImuActions.setMapOrientation(e),
         }
     ]
 
