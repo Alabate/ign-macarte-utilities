@@ -120,13 +120,17 @@ class ImuGui {
             // Compute text rotation angle if possible
             let textAngle = 0
             if (ImuUtils.isRectangle(geometry)) {
-                textAngle = ImuUtils.getRectangleAngle(geometry) - viewAngle
-                textAngle = ImuUtils.convertUnitCircleAngleToClockwiseLeft(textAngle)
+                textAngle = ImuUtils.getRectangleAngle(geometry)
+                textAngle = ImuUtils.convertUnitCircleAngleToClockwiseLeft(
+                    textAngle - viewAngle
+                )
             }
             else {
-                const segmentAngle = ImuUtils.getSegmentAngle(geometry) - viewAngle
+                const segmentAngle = ImuUtils.getSegmentAngle(geometry)
                 if (segmentAngle) {
-                    textAngle = ImuUtils.convertUnitCircleAngleToClockwiseLeft(segmentAngle)
+                    textAngle = ImuUtils.convertUnitCircleAngleToClockwiseLeft(
+                        segmentAngle - viewAngle
+                    )
                 }
             }
 
