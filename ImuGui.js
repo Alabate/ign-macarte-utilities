@@ -7,19 +7,19 @@ class ImuGui {
             title: 'Couper (ctrl+x)',
             icon: 'fa-scissors',
             action: e => ImuActions.cut(e),
-            documentEvent: 'cut',
+            bodyEvent: 'cut',
         },
         {
             title: 'Copier (ctrl+c)',
             icon: 'fa-copy',
             action: e => ImuActions.copy(e),
-            documentEvent: 'copy',
+            bodyEvent: 'copy',
         },
         {
             title: 'Coller (ctrl+v)',
             icon: 'fa-paste',
             action: e => ImuActions.paste(e),
-            documentEvent: 'paste',
+            bodyEvent: 'paste',
         },
         {
             title: 'Coller le style',
@@ -78,9 +78,17 @@ class ImuGui {
             element.addEventListener('click', button.action)
             drawToolBoxInner.appendChild(element)
 
-            // Bind shortcuts
-            if (button.documentEvent) {
-                document.addEventListener(button.documentEvent, button.action);
+            // Bind shorcuts only if event target is body because that's what
+            // append when you click on the canva and press ctrl+c.
+            // The target will not be body, if you try to copy and
+            // paste text from somewhere else in the page
+            if (button.bodyEvent) {
+                document.addEventListener(button.bodyEvent, e => {
+                    if (e.target == document.body) {
+                        e.preventDefault()
+                        return button.action(e)
+                    }
+                });
             }
         }
     }
