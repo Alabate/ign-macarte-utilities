@@ -51,6 +51,11 @@ class ImuGui {
             title: 'Changer le calque des objects sélectionnés',
             icon: 'fa-exchange',
             action: e => ImuActions.moveToLayer(e),
+        },
+        {
+            title: 'Afficher des informations sur l\'object sélectionné',
+            iconText: 'i',
+            action: e => ImuActions.showInfo(e),
         }
     ]
 

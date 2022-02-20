@@ -314,6 +314,7 @@ class ImuActions {
     static delete() {
         const selectedFeatures = ImuUtils.getSelectedFeatures()
         if (selectedFeatures.length == 0) {
+            ImuUtils.timedMsgBox('Veuiller sélectionner un ou des objects.')
             return
         }
         ImuUtils.macarte.wdialog.msgChoice(
@@ -333,6 +334,7 @@ class ImuActions {
     static moveToLayer() {
         const selectedFeatures = ImuUtils.getSelectedFeatures()
         if (selectedFeatures.length == 0) {
+            ImuUtils.timedMsgBox('Veuiller sélectionner un ou des objects.')
             return
         }
 
@@ -388,4 +390,109 @@ class ImuActions {
             ImuUtils.macarte.wdialog.hide()
         }
     }
+
+    /**
+     * Show information on selected feature
+     */
+    static showInfo() {
+        const selectedFeatures = ImuUtils.getSelectedFeatures()
+        if (selectedFeatures.length == 0) {
+            ImuUtils.timedMsgBox('Veuiller sélectionner un object.')
+            return
+        }
+        if (selectedFeatures.length > 1) {
+            ImuUtils.timedMsgBox('Veuiller sélectionner un seul object.')
+            return
+        }
+        console.log('[IMU] Selected feature:', selectedFeatures[0])
+
+        // Form
+        const htmlTemplate = `
+            <h3>Informations sur l'objet sélectionnés</h3>
+            <div id="showInfoDiv">
+            </form>
+        `
+        ImuUtils.macarte.wdialog.show(
+            htmlTemplate,
+            { 'modal': false, 'width': 600, 'class': 'wizzard'}
+        );
+
+        // Utility consts
+        const infoDiv = document.getElementById('showInfoDiv')
+        const feature = selectedFeatures[0]
+        const geometry = feature.getGeometry()
+        const coordinates = geometry.getCoordinates()
+
+        // Add rectangle informations
+        const isRectangle = ImuUtils.isRectangle(geometry)
+        infoDiv.innerHTML +=
+            '<h4>Rectangle</h4>'
+            + `isRectangle: ${isRectangle}<br/>`
+        if (isRectangle) {
+            const a = ImuUtils.getDistance(coordinates[0][0], coordinates[0][1])
+            const b = ImuUtils.getDistance(coordinates[0][1], coordinates[0][2])
+            const ratio = ImuUtils.computeDistanceConversionRatio(a)
+            const angle = ImuUtils.getRectangleAngle(geometry)*180/Math.PI
+            infoDiv.innerHTML +=
+                `getRectangleAngle: ${angle.toFixed(2)}<br/>`
+                + `Dimensions: ${(a/ratio).toFixed(3)} x ${(b/ratio).toFixed(3)} m<br/>`
+        }
+
+        // Add segment informations
+        const segmentAngle = ImuUtils.getSegmentAngle(geometry)
+        const isSegment = segmentAngle !== false
+        infoDiv.innerHTML +=
+            '<h4>Segment</h4>'
+            + `isSegment: ${isSegment}<br/>`
+        if (isSegment) {
+            const length = ImuUtils.getDistance(coordinates[0], coordinates[1])
+            const ratio = ImuUtils.computeDistanceConversionRatio(length)
+            const angle = segmentAngle * 180 / Math.PI
+            infoDiv.innerHTML +=
+                `getSegmentAngle: ${angle.toFixed(2)}°<br/>`
+                + `Length: ${(length/ratio).toFixed(3)} m<br/>`
+        }
+
+        // LineString
+        const isLineString = (geometry.getType() == 'LineString')
+        infoDiv.innerHTML +=
+            '<h4>LineString</h4>'
+            + `isLineString: ${isLineString}<br/>`
+        if (isLineString) {
+            const firstLength = ImuUtils.getDistance(coordinates[0], coordinates[1])
+            const ratio = ImuUtils.computeDistanceConversionRatio(firstLength)
+            for (let i = 1; i < coordinates.length; i++) {
+                const length = ImuUtils.getDistance(coordinates[i-1], coordinates[i])
+                infoDiv.innerHTML +=
+                    `segment length: ${(length/ratio).toFixed(3)} m<br/>`
+
+            }
+        }
+
+        // isPolygon
+        const isPolygon = (geometry.getType() == 'Polygon')
+        infoDiv.innerHTML +=
+            '<h4>Polygon</h4>'
+            + `isPolygon: ${isPolygon}<br/>`
+        if (isPolygon) {
+            const firstLength = ImuUtils.getDistance(coordinates[0][0], coordinates[0][1])
+            const ratio = ImuUtils.computeDistanceConversionRatio(firstLength)
+            for (let i = 0; i < coordinates[0].length; i++) {
+                const precedentCoordinates = (i == 0) ? coordinates[0][coordinates[0].length - 1] : coordinates[0][i-1]
+                const length = ImuUtils.getDistance(precedentCoordinates, coordinates[0][i])
+                infoDiv.innerHTML +=
+                    `segment length: ${(length/ratio).toFixed(3)} m<br/>`
+
+            }
+        }
+
+        // Add coordinate list to infos
+        infoDiv.innerHTML +=
+            '<h4>Coordonnées</h4>'
+            + '<pre>' + JSON.stringify(coordinates, null, 2) + '</pre>'
+            // Todo distances entre chaque point
+    }
+
+
+
 }
