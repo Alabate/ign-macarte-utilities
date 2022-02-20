@@ -163,10 +163,38 @@ class ImuGui {
      * on each layer
      */
     static initStyleTweaking() {
-        window.macarte.carte.map.getLayers()
+        ImuUtils.map.getLayers()
         .addEventListener('change:length', () => {
             this.#configureTweakedStyleFunction()
         })
         this.#configureTweakedStyleFunction()
+    }
+
+    /**
+     * Called when interaction list has changed to tweak new interactions
+     */
+    static #tweakInteractions() {
+        // Tweak addCondition on TransformInteraction
+        // to allow multi select with shift
+        const interactions = ImuUtils.map.getInteractions().getArray()
+        for (const interaction of interactions) {
+            if (interaction instanceof ol.interaction.Transform) {
+                // This is the same as setting the addCondition option
+                // whild construcitng the TransformInteraction. Except that we
+                // cannot modify this code easily
+                interaction.addFn_ = ol.events.condition.shiftKeyOnly
+            }
+        }
+    }
+
+    /**
+     * Add event listening on interaction collection to allow tweaking on them
+     */
+    static initInteractionTweaking() {
+        ImuUtils.map.getInteractions()
+        .addEventListener('change:length', () => {
+            this.#tweakInteractions()
+        })
+        this.#tweakInteractions()
     }
 }

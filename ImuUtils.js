@@ -41,8 +41,8 @@ class ImuUtils {
 
         // If it didn't work try to get what's selected by the transform mode
         interaction = this.carte.getInteractionByName("TransformInteraction")
-        if (interaction && Array.isArray(interaction.selection_)) {
-            return interaction.selection_
+        if (interaction && Array.isArray(interaction.getFeatures())) {
+            return interaction.getFeatures()
         }
 
         // Else act like nothing is selected
@@ -81,7 +81,9 @@ class ImuUtils {
             const interaction = this.carte.getInteractionByName("TransformInteraction")
 
             // We select the first one because this mode doens't support more
-            interaction.select(features[0])
+            for (const feature of features) {
+                interaction.select(feature, true)
+            }
         }
         else {
             // Ensure we are in the selection mode

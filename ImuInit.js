@@ -7,6 +7,7 @@ function ImuInit() {
     window.addEventListener('load', () => {
         ImuGui.addDrawToolBoxButtons()
         ImuGui.initStyleTweaking()
+        ImuGui.initInteractionTweaking()
     })
 }
 ImuInit()
