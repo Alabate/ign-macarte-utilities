@@ -207,7 +207,6 @@ class ImuUtils {
 
     /**
      * Get angle of the longest side of the rectangle on unit circle
-     *  (=> counter clockwise + start on the right)
      * If geometry is not a rectangle, this will return unexpected results
      * @param {ol.geom.Geometry} geometry The geometry work on
      * @returns {float} The angle of the longest side of the rectangle in radians
@@ -229,7 +228,6 @@ class ImuUtils {
 
     /**
      * Return the angle of the segment on the unit circle
-     *  (=> counter clockwise + start on the right)
      * This function only work for 2 points line string
      * @param {ol.geom.Geometry} geometry The geometry work on
      * @returns {float} The angle of the segment or false if geometry is not a 2
@@ -278,5 +276,14 @@ class ImuUtils {
         const line = new ol.geom.LineString([[x1, center[1]], [x2, center[1]]])
         const ratio = (width != 0) ? Math.abs(width / ol.sphere.getLength(line)) : 1
         return ratio
+    }
+
+    /**
+     * Convert an angle in the unit circle : counter clockwise + 0 on the right
+     * To clockwise + 0 on the left and always positive [0;2pi]
+     * @param angle The angle to convert in radian
+     */
+    static convertUnitCircleAngleToClockwiseLeft(angle) {
+        return (4*Math.PI - angle) % (2*Math.PI)
     }
 }

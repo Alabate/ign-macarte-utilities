@@ -116,22 +116,25 @@ class ImuGui {
     static #getTweakedStyleFunction(styleFn) {
         return (feature, resolution, clustered) => {
             const geometry = feature.getGeometry()
+            const viewAngle = ImuUtils.map.getView().getRotation()
             // Compute text rotation angle if possible
             let textAngle = 0
             if (ImuUtils.isRectangle(geometry)) {
-                textAngle = ImuUtils.getRectangleAngle(geometry)
-                // We have a trigonometric angle between pi and -pi
-                // We want a positive clockwise angle with 0 on the left
-                textAngle = (2*Math.PI - textAngle) % (2*Math.PI)
+                textAngle = ImuUtils.getRectangleAngle(geometry) - viewAngle
+                textAngle = ImuUtils.convertUnitCircleAngleToClockwiseLeft(textAngle)
             }
             else {
-                const segmentAngle = ImuUtils.getSegmentAngle(geometry)
+                const segmentAngle = ImuUtils.getSegmentAngle(geometry) - viewAngle
                 if (segmentAngle) {
-                    textAngle = segmentAngle
-                    // We have a trigonometric angle between pi and -pi
-                    // We want a positive clockwise angle with 0 on the left
-                    textAngle = (2*Math.PI - textAngle) % (2*Math.PI)
+                    textAngle = ImuUtils.convertUnitCircleAngleToClockwiseLeft(segmentAngle)
                 }
+            }
+
+            // To make text more readable, we want to always have a rotation of
+            // max +-90° from perfect angle wich is 0°
+            // => 0°->90° and 270°->360° are ok
+            if (textAngle >= Math.PI/2 && textAngle <= 3/2*Math.PI) {
+                textAngle = (textAngle + Math.PI) % (2*Math.PI)
             }
 
             let styles = styleFn(feature, resolution, clustered)
