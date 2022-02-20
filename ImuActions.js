@@ -70,16 +70,19 @@ class ImuActions {
 
     /**
      * Paste style of the first element copied onto selected features
-     * Don't copy text even if it's in the style object
+     * Don't copy label text and size even if it's in the style object
      */
     static pasteStyle() {
-        // Get style of the first clipboard element and remove label
+        // Get style of the first clipboard element and remove label text and size
         if (this.clipboard.length == 0) {
             return
         }
         const copiedStyle = Object.assign({}, this.clipboard[0].getIgnStyle())
         if (copiedStyle.labelAttribute) {
             delete copiedStyle.labelAttribute
+        }
+        if (copiedStyle.textSize) {
+            delete copiedStyle.textSize
         }
 
         // Paste style on all selected features while keeping the label
@@ -88,6 +91,9 @@ class ImuActions {
             const newStyle = Object.assign({}, copiedStyle)
             if (feature.getIgnStyle().labelAttribute) {
                 newStyle.labelAttribute = feature.getIgnStyle().labelAttribute
+            }
+            if (feature.getIgnStyle().textSize) {
+                newStyle.textSize = feature.getIgnStyle().textSize
             }
             feature.setIgnStyle(newStyle)
             feature.changed()
