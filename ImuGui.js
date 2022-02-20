@@ -4,6 +4,12 @@
 class ImuGui {
     static BUTTONS = [
         {
+            title: 'Supprimer (suppr)',
+            icon: 'fa-trash',
+            action: e => ImuActions.delete(e),
+            bodyKeyDown: 'Delete',
+        },
+        {
             title: 'Couper (ctrl+x)',
             icon: 'fa-scissors',
             action: e => ImuActions.cut(e),
@@ -58,6 +64,14 @@ class ImuGui {
     static addDrawToolBoxButtons() {
         const drawToolBoxInner = this.#getDrawToolBoxInner()
 
+        // Remove the 'Remove' button because we have a better delete function
+        for (const child of drawToolBoxInner.children) {
+            if (child.dataset.mode == 'Remove') {
+                child.style.display = 'None'
+            }
+        }
+
+
         // Add vertical separator
         // We use a <i> tag because this is wath they used
         const separatorElement = document.createElement('i');
@@ -90,6 +104,14 @@ class ImuGui {
             if (button.bodyEvent) {
                 document.addEventListener(button.bodyEvent, e => {
                     if (e.target == document.body) {
+                        e.preventDefault()
+                        return button.action(e)
+                    }
+                });
+            }
+            if (button.bodyKeyDown) {
+                document.addEventListener('keydown', e => {
+                    if (e.target == document.body && e.code == button.bodyKeyDown) {
                         e.preventDefault()
                         return button.action(e)
                     }

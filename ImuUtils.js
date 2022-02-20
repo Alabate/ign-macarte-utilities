@@ -286,4 +286,19 @@ class ImuUtils {
     static convertUnitCircleAngleToClockwiseLeft(angle) {
         return (4*Math.PI - angle) % (2*Math.PI)
     }
+
+    /**
+     * Look for features on all layers and delete them
+     * Note: You need to unselect to definitely delete them
+     * @param {ol.Feature[]} features of feature to delete
+     */
+    static deleteFeaturesFromLayers(features) {
+        for (const feature of features) {
+            const layers = ImuUtils.findLayersFromFeature(feature)
+            for (const layer of layers) {
+                layer.getSource().removeFeature(feature);
+                feature.changed()
+            }
+        }
+    }
 }

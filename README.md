@@ -12,3 +12,8 @@ Set of utilities to improve usability of macarte.ign.fr
 * Create a segment with given real length in meters
 * Move and transform multiple features at the same time by selecting them with shift+click
 * Rotate the full map
+* Improved delete button
+    * Delete should not be an edition mode, it's an action applied on selection
+    * Add the 'Del' key shortcut
+    * Support deleting elements from different layers
+    * Support transform selection

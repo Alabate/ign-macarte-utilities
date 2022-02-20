@@ -24,13 +24,8 @@ class ImuActions {
 
         // Delete selected features from all layers
         const selectedFeatures = ImuUtils.getSelectedFeatures()
-        for (const feature of selectedFeatures) {
-            const layers = ImuUtils.findLayersFromFeature(feature)
-            for (const layer of layers) {
-                layer.getSource().removeFeature(feature);
-                feature.changed()
-            }
-        }
+        ImuUtils.deleteFeaturesFromLayers(selectedFeatures)
+
         // Clear selection to definitely delete them
         ImuUtils.unselect()
     }
@@ -307,5 +302,28 @@ class ImuActions {
             // Set map rotation
             ImuUtils.map.getView().setRotation(rotationDeg / 180 * Math.PI)
         }
+    }
+
+    /**
+     * Recreate the delete feature to fix the foolowing issues
+     * - Delete should not be an edition mode, it's an action applied on selection
+     * - Add support for delete key shortcut
+     * - Support deleting elements from different layers
+     * - Support transform selection
+     */
+    static delete() {
+        const selectedFeatures = ImuUtils.getSelectedFeatures()
+        if (selectedFeatures.length == 0) {
+            return
+        }
+        ImuUtils.macarte.wdialog.msgChoice(
+            `Supprimer les ${selectedFeatures.length} objects sélectionnés ?`,
+            () => {
+                ImuUtils.deleteFeaturesFromLayers(selectedFeatures)
+                ImuUtils.unselect()
+                ImuUtils.macarte.wdialog.hide()
+            },
+            () => ImuUtils.macarte.wdialog.hide()
+        );
     }
 }
