@@ -174,7 +174,8 @@ class ImuActions {
                     [[[x1, y1], [x2, y1], [x2, y2], [x1, y2]]]
                 )
             })
-            feature.getGeometry().rotate(- angle / 180 * Math.PI, center)
+            const viewAngle = ImuUtils.map.getView().getRotation()
+            feature.getGeometry().rotate(viewAngle - angle / 180 * Math.PI, center)
 
             // Add rectangle to the currently selected layer
             // And select it in transform mode
@@ -245,7 +246,8 @@ class ImuActions {
                     [[x1, center[1]], [x2, center[1]]]
                 )
             })
-            feature.getGeometry().rotate(- angle / 180 * Math.PI, center)
+            const viewAngle = ImuUtils.map.getView().getRotation()
+            feature.getGeometry().rotate(viewAngle - angle / 180 * Math.PI, center)
 
             // Add rectangle to the currently selected layer
             // And select it in transform mode
